@@ -11,8 +11,6 @@
 </style>
 
 <div class="col-md-12">
-
-
     <p>
         <a href="@Url.Action("Create")" class="btn btn-outline-primary btn-block hidden-sm-up">Upload Song</a>
         <a href="@Url.Action("Create")" class="btn btn-outline-primary hidden-xs-down">Upload Song</a>
@@ -21,42 +19,52 @@
 
 
 <div class="col-md-6">
-    <div id="song-accordion" role="tablist" aria-multiselectable="true">
-        <div class="card">
-            @foreach (var song in Model)
-            {
-                if (!string.IsNullOrEmpty(song.Link))
-                {
-                    song.Link = song.Link.Remove(song.Link.Length - 1, 1) + "1";
-                }
-                bool recent = false;
-                var collapseShow = string.Empty;
-                if (TempData["RecentSongId"] != null && song.Id == (int)TempData["RecentSongId"])
-                {
-                    recent = true;
-                    collapseShow = "show";
-
-                }
-                <div class="card-header" role="tab" id="heading-@song.Id">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@song.Id" aria-expanded="true" aria-controls="collapse-@song.Id">
-                        @song.Title <small class="text-muted">@song.Artist</small>
-                    </a>
-                </div>
-                <div id="collapse-@song.Id" data-songId="@song.Id" class="collapse @collapseShow" role="tabpanel" aria-labelledby="heading-@song.Id">
-                    <div class="card-block">
-                        @if (recent)
-                        {
-                            <audio name="media-@song.Id" id="media-@song.Id" controls autoplay>
-                                <source src="@song.Link" type="application/ogg">
-                            </audio>
-                        }
-                    </div>
-                </div>
-
-            }
+    @if (@Model.Count() == 0)
+    {
+        <div class="alert alert-info" role="alert">
+            <strong>Kalooy pud nimo...</strong> We don't have your song yet. Try a different search.
         </div>
+    }
+    else
+    {
+        <div id="song-accordion" role="tablist" aria-multiselectable="true">
+            <div class="card">
+                @foreach (var song in Model)
+                {
+                    if (!string.IsNullOrEmpty(song.Link))
+                    {
+                        song.Link = song.Link.Remove(song.Link.Length - 1, 1) + "1";
+                    }
+                    bool recent = false;
+                    var collapseShow = string.Empty;
+                    if (TempData["RecentSongId"] != null && song.Id == (int)TempData["RecentSongId"])
+                    {
+                        recent = true;
+                        collapseShow = "show";
 
-    </div>
+                    }
+                    <div class="card-header" role="tab" id="heading-@song.Id">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@song.Id" aria-expanded="true" aria-controls="collapse-@song.Id">
+                            @song.Title <small class="text-muted">@song.Artist</small>
+                        </a>
+                    </div>
+                    <div id="collapse-@song.Id" data-songId="@song.Id" class="collapse @collapseShow" role="tabpanel" aria-labelledby="heading-@song.Id">
+                        <div class="card-block">
+                            @if (recent)
+                            {
+                                <audio name="media-@song.Id" id="media-@song.Id" controls autoplay>
+                                    <source src="@song.Link" type="application/ogg">
+                                </audio>
+                            }
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+        </div>
+    }
+
 </div>
 
 

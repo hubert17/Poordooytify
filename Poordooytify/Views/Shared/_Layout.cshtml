@@ -8,7 +8,8 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @*<meta name="viewport" content="width=device-width, initial-scale=1.0">*@
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta property="og:title" content="Poordooytify by Bernard Gabon" />
     <meta property="og:url" content="http://www.bernardgabon.com" />
     <meta property="og:description" content="A poor man's opensource web music player created by Bernard Gabon." />
@@ -52,19 +53,35 @@
                 ☰
             </button>
             <div class="navbar-collapse collapse" id="navigation-menu">
-                <ul class="nav navbar-nav hidden-sm-up">
+                <ul class="nav navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="#" onClick="alert('Poordooytify - a poor man\'s opensource web music player created by Bernard Gabon. This is an opensource project. Feel free to contribute on Github.com/hubert17/poordooytify.')">About</a>
                     </li>
                 </ul>
+                <form action="@Url.Action("index", "songlib")" class="mx-2 my-auto d-inline w-100 hidden-sm-up" name="Searching">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search song title, artist, genre">
+                        <span class="input-group-btn">
+                            <button class="btn btn-outline-secondary" type="submit">GO</button>
+                        </span>
+                    </div>
+                </form>
             </div>
             <a class="navbar-brand mx-auto" href="#">Poordooytify</a>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav ml-auto">
+                <ul class="nav navbar-nav ml-auto  hidden-sm-up">
                     <li class="nav-item">
                         <a class="nav-link" href="#" onClick="alert('Poordooytify - a poor man\'s opensource web music player created by Bernard Gabon. This is an opensource project. Feel free to contribute on Github.com/hubert17/poordooytify.')">About</a>
                     </li>
                 </ul>
+                <form action="@Url.Action("index", "songlib")" class="mx-2 my-auto d-inline w-100" name="Searching">
+                    <div class="input-group w-75 float-right">
+                        <input type="text" name="q" class="form-control" placeholder="Search song title, artist, genre">
+                        <span class="input-group-btn">
+                            <button class="btn btn-outline-secondary" type="submit">GO</button>
+                        </span>
+                    </div>
+                </form>
             </div>
         </nav>
 

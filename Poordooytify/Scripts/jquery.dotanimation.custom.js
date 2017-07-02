@@ -1,5 +1,5 @@
 ﻿// Disable button and start dot animation
-var form = $('form');
+var form = $('#form-submit');
 form.submit(function () {
     if (form.valid()) {
        alert('Naga-depende ang kadugayon sa pag-upload sa imong internet connection. Taasi gamay imong pasensya. Salamat sa pag-share. :)');

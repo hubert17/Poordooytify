@@ -19,9 +19,17 @@ namespace Poordooytify.Controllers
         PoordooytifyContext db = new PoordooytifyContext();
 
         // GET: Home
-        public ActionResult Index()
+        public ActionResult Index(string q = "")
         {
-            var songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(o => o.Id).ToList();
+            var songs = new List<Song>();
+            if(string.IsNullOrEmpty(q))
+            {
+                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(o => o.Id).ToList();
+            }
+            else
+            {
+                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).Where(x => x.Title.Contains(q) || x.Artist.Contains(q) || x.Genre.Contains(q)).Take(10).OrderBy(o=>o.Title).ToList();                
+            }
             return View(songs);
         }
 
