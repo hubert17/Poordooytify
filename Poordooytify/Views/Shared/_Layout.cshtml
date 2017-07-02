@@ -1,0 +1,95 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Poordooytify by Bernard Gabon" />
+    <meta property="og:url" content="http://www.bernardgabon.com" />
+    <meta property="og:description" content="A poor man's opensource web music player created by Bernard Gabon." />
+    <title>@ViewBag.Title - Poordooytify by Bernard Gabon</title>
+
+    @if (TempData["Message"] != null)
+    {
+        <script>
+            alert('@TempData["Message"]')
+        </script>
+    }
+
+    @if (HttpContext.Current.Request.IsLocal)
+    {
+        <link href="@Url.Content("~/Content/bootstrap.css")" rel="stylesheet" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    }
+
+    @* theme-color - The colour of the toolbar in Chrome M39+ *@
+    <meta name="theme-color" content="#0275d8">
+
+    <style>
+        body {
+            margin-top: 60px;
+        }
+    </style>
+
+</head>
+<body style="overflow-x:hidden">
+    <div class="container body-content"> 
+        @if (ViewBag.ResultMessage != null)
+        {
+            <div class="alert alert-info">@ViewBag.ResultMessage</div>
+        }
+
+        <nav id="topNav" class="navbar fixed-top navbar-toggleable-sm navbar-inverse bg-primary">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navigation-menu" aria-controls="navigation-menu" aria-expanded="false" aria-label="Toggle navigation">
+                ☰
+            </button>
+            <div class="navbar-collapse collapse" id="navigation-menu">
+                <ul class="nav navbar-nav hidden-sm-up">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onClick="alert('Poordooytify - a poor man\'s opensource web music player created by Bernard Gabon. This is an opensource project. Feel free to contribute on Github.com/hubert17/poordooytify.')">About</a>
+                    </li>
+                </ul>
+            </div>
+            <a class="navbar-brand mx-auto" href="#">Poordooytify</a>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onClick="alert('Poordooytify - a poor man\'s opensource web music player created by Bernard Gabon. This is an opensource project. Feel free to contribute on Github.com/hubert17/poordooytify.')">About</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        @RenderBody()
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <hr />
+            <footer>
+                <p>&copy; @DateTime.Now.Year - Bernard S. Gabon</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(document).ready(function () {
+            $('#nextAll').nextAll().remove();
+        });
+    </script>
+    <hr id="nextAll" style="display:none;" />
+</body>
+</html>

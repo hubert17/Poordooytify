@@ -1,0 +1,107 @@
+﻿@model Poordooytify.Models.Song
+
+@{
+    ViewBag.Title = "Music Uploader";
+}
+
+<div class="col-md-12">
+    <h2>Upload your song</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+
+        <form action="@Url.Action("UploadAudioFile", "Songlib")" method="post" enctype="multipart/form-data" name="Uploading" >
+
+            <div class="form-group">
+                <label for="audioFile" class="control-label col-md-3">File</label>
+                <div class="col-md-9">
+                    <input type="file" name="audioFile" id="audioFile" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="BitRate">Bitrate</label>
+                <div class="col-md-9">
+                    <select name="BitRate" id="BitRate" class="form-control">
+                        <option value="48000">48Kbps Stereo</option>
+                        <option value="24000">24Kbps Mono</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="@nameof(Model.Title)" class="control-label col-md-3">@nameof(Model.Title)</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" name="@nameof(Model.Title)" id="@nameof(Model.Title)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="@nameof(Model.Artist)" class="control-label col-md-3">@nameof(Model.Artist)</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control typeahead" name="@nameof(Model.Artist)" id="@nameof(Model.Artist)" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="@nameof(Model.Genre)" class="control-label col-md-3">@nameof(Model.Genre)</label>
+                <div class="col-md-9">
+                    <input type="text" class="form-control" name="@nameof(Model.Genre)" id="@nameof(Model.Genre)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="@nameof(Model.CloudTokenId)" class="control-label col-md-3">Cloud Account</label>
+                <div class="col-md-9">
+                    @Html.DropDownListFor(m => m.CloudTokenId, ViewBag.storage as List<SelectListItem>, new { @class = "form-control" })
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-9">
+                    <button type="submit" class="btn btn-outline-primary">Upload</button>
+                    <a href="@Url.Action("Index", "Songlib")" class="btn btn-secondary float-right" role="button" aria-pressed="true"><span class="glyphicons glyphicons-arrow-left"></span> Song List</a>
+                </div>
+            </div>
+        </form>
+
+
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+@{ Html.RenderPartial("_ValidationScriptsPartial"); }
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js" integrity="sha256-LOnFraxKlOhESwdU/dX+K0GArwymUDups0czPWLEg4E=" crossorigin="anonymous"></script>
+    
+    <script>
+        $(document).ready(function () {
+            $('.typeahead').typeahead({
+                autoSelect: true,
+                minLength: 3,
+                delay: 200,
+                source: function (query, process) {
+                    $.ajax({
+                        url: '@Url.Action("Artists","Songlib")',
+                        data: { q: query },
+                        dataType: 'json'
+                    })
+                        .done(function (response) {
+                            return process(response);
+                        });
+                }
+            });
+        });
+    </script>
+
+@{ Html.RenderPartial("_SubmitAnimationScriptPartial"); }
+
+
+}

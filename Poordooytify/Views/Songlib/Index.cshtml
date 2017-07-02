@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Poordooytify.Models.Song>
+
+@{
+    ViewBag.Title = "Song List";
+}
+
+<style>
+    audio {
+        width: 100%
+    }
+</style>
+
+<div class="col-md-12">
+
+
+    <p>
+        <a href="@Url.Action("Create")" class="btn btn-outline-primary btn-block hidden-sm-up">Upload Song</a>
+        <a href="@Url.Action("Create")" class="btn btn-outline-primary hidden-xs-down">Upload Song</a>
+    </p>
+</div>
+
+
+<div class="col-md-6">
+    <div id="song-accordion" role="tablist" aria-multiselectable="true">
+        <div class="card">
+            @foreach (var song in Model)
+            {
+                if (!string.IsNullOrEmpty(song.Link))
+                {
+                    song.Link = song.Link.Remove(song.Link.Length - 1, 1) + "1";
+                }
+                bool recent = false;
+                var collapseShow = string.Empty;
+                if (TempData["RecentSongId"] != null && song.Id == (int)TempData["RecentSongId"])
+                {
+                    recent = true;
+                    collapseShow = "show";
+
+                }
+                <div class="card-header" role="tab" id="heading-@song.Id">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@song.Id" aria-expanded="true" aria-controls="collapse-@song.Id">
+                        @song.Title <small class="text-muted">@song.Artist</small>
+                    </a>
+                </div>
+                <div id="collapse-@song.Id" data-songId="@song.Id" class="collapse @collapseShow" role="tabpanel" aria-labelledby="heading-@song.Id">
+                    <div class="card-block">
+                        @if (recent)
+                        {
+                            <audio name="media-@song.Id" id="media-@song.Id" controls autoplay>
+                                <source src="@song.Link" type="application/ogg">
+                            </audio>
+                        }
+                    </div>
+                </div>
+
+            }
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+
+    <script>
+        $('#song-accordion > .card > .collapse').on('show.bs.collapse', function (e) {
+            //alert('Event fired on #' + e.currentTarget.id);
+            var songId = $('#' + e.currentTarget.id).attr('data-songId');
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetLink","Songlib")",
+                dataType: 'json',
+                data: {
+                    songId: songId
+                },
+                success: function (result) {
+                    if ($('#collapse-' + songId + ' > .card-block').find('audio').length == 0)
+                    {
+                        $('#collapse-' + songId + ' > .card-block').html('<audio name="media-' + songId + '" id="media-' + songId + '" controls><source src="' + result.songLink.slice(0, -1) + '1" type="application/ogg"></audio>');
+                    }
+                }
+            });
+        })
+    </script>
+}
