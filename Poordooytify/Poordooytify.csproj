@@ -113,10 +113,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\facebook.css" />
+    <Content Include="Content\tagsinput.css" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\jquery.dotanimation.custom.js" />
     <Content Include="Scripts\jquery.dotanimation.min.js" />
+    <Content Include="Scripts\tagsinput.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +130,8 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\CloudToken.cs" />
+    <Compile Include="Models\Genre.cs" />
+    <Compile Include="Models\GenreController.cs" />
     <Compile Include="Models\PoordooytifyContext.cs" />
     <Compile Include="Models\Song.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -161,6 +164,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="TempUpload\" />
+    <Folder Include="Views\Genre\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

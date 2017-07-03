@@ -27,7 +27,7 @@
     }
     else
     {
-        <div id="song-accordion" role="tablist" aria-multiselectable="true">
+        <div id="accordion" role="tablist" aria-multiselectable="true">
             <div class="card">
                 @foreach (var song in Model)
                 {
@@ -72,23 +72,65 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
 
     <script>
-        $('#song-accordion > .card > .collapse').on('show.bs.collapse', function (e) {
+        @{
+            var songIds = Model.Select(s => s.Id).ToList();
+            var arrIds = Newtonsoft.Json.JsonConvert.SerializeObject(songIds);
+        }
+
+        var arrSongIds = @arrIds;
+        //var curId = arrSongIds[0];
+
+        $('#accordion > .card > .collapse').on('show.bs.collapse', function (e) {
             //alert('Event fired on #' + e.currentTarget.id);
+            var sounds = document.getElementsByTagName('audio');
+            for (i = 0; i < sounds.length; i++) sounds[i].pause();
+
             var songId = $('#' + e.currentTarget.id).attr('data-songId');
-            $.ajax({
-                type: "GET",
-                url: "@Url.Action("GetLink","Songlib")",
-                dataType: 'json',
-                data: {
-                    songId: songId
-                },
-                success: function (result) {
-                    if ($('#collapse-' + songId + ' > .card-block').find('audio').length == 0)
-                    {
-                        $('#collapse-' + songId + ' > .card-block').html('<audio name="media-' + songId + '" id="media-' + songId + '" controls><source src="' + result.songLink.slice(0, -1) + '1" type="application/ogg"></audio>');
+            if ($('#collapse-' + songId + ' > .card-block').find('audio').length == 0) {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("GetLink","Songlib")",
+                    dataType: 'json',
+                    data: {
+                        songId: songId
+                    },
+                    success: function (result) {
+                        $('#collapse-' + songId + ' > .card-block').html('<audio name="media-' + songId + '" id="media-' + songId + '" autoplay controls><source src="' + result.songLink.slice(0, -1) + '1" type="application/ogg"></audio>');
+
+                        var curAudio = document.getElementById("media-" + songId);
+                        curAudio.onplay = function () {
+                            //console.log("The video has started to play: " + songId);
+                            curAudio.onended = function () {
+                                var random = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];
+                                //console.log("The audio has ended: " + songId);
+                                $('#collapse-' + random).collapse('show');
+                                $('#collapse-' + songId).collapse('hide');
+                                $('html, body').animate({
+                                    scrollTop: $('#collapse-' + random).offset().top - 200
+                                }, 4000);
+                                ////console.log(".collapse me: " + random);
+                            };
+                        };
+
                     }
-                }
-            });
+                });
+            }
+            else {
+                curAudio = document.getElementById("media-" + songId);
+                curAudio.play();
+                curAudio.onplay = function () {
+                    curAudio.onended = function () {
+                        var random = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];
+                        $('#collapse-' + random).collapse('show');
+                        $('#collapse-' + songId).collapse('hide');
+                        $('html, body').animate({
+                            scrollTop: $('#collapse-' + random).offset().top - 200
+                        }, 4000);
+                    };
+                };
+            }
+
+
         })
     </script>
 }

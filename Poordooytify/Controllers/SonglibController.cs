@@ -19,16 +19,19 @@ namespace Poordooytify.Controllers
         PoordooytifyContext db = new PoordooytifyContext();
 
         // GET: Home
-        public ActionResult Index(string q = "")
+        public ActionResult Index(string q = "", string r = "")
         {
             var songs = new List<Song>();
             if(string.IsNullOrEmpty(q))
             {
-                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(o => o.Id).ToList();
+                if(string.IsNullOrEmpty(r))
+                    songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(o => o.Id).ToList();
+                else
+                    songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(d=>d.PlayCount).Take(20).ToList();
             }
             else
             {
-                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).Where(x => x.Title.Contains(q) || x.Artist.Contains(q) || x.Genre.Contains(q)).Take(10).OrderBy(o=>o.Title).ToList();                
+                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).Where(x => x.Title.Contains(q) || x.Artist.Contains(q) || x.Genre.Contains(q)).Take(10).OrderBy(o=>o.PlayCount).ToList();                
             }
             return View(songs);
         }
@@ -42,10 +45,15 @@ namespace Poordooytify.Controllers
 
         public ActionResult GetLink(int songId)
         {
+            var song = new Song();
             string songLink = string.Empty;
             try
             {
-                songLink = db.Songs.Find(songId).Link;
+                song = db.Songs.Find(songId);
+                songLink = song.Link;
+                song.PlayCount = song.PlayCount + 1;
+                db.Entry(song).State = EntityState.Modified;
+                db.SaveChanges();
             }
             catch { }
             return Json(new { songLink = songLink }, JsonRequestBehavior.AllowGet);
@@ -81,6 +89,7 @@ namespace Poordooytify.Controllers
         public ActionResult UploadAudioFile(HttpPostedFileBase audioFile, Song song, string BitRate)
         {
             TempData["RecentSongId"] = 0;
+            var songId = 0;
             try
             {
                 if (audioFile.ContentLength > 0)
@@ -88,11 +97,13 @@ namespace Poordooytify.Controllers
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     song.Title = textInfo.ToTitleCase(song.Title);
                     song.Artist = textInfo.ToTitleCase(song.Artist);
+                    song.PlayCount = 0;
                     db.Songs.Add(song);
                     song.OrigFilename = Path.GetFileName(audioFile.FileName);
                     song.DateAdded = DateTime.Now;
                     db.SaveChanges();
 
+                    songId = song.Id;
                     string _FileName = song.Title + " - " + song.Artist + " [" + song.Id + "]" + Path.GetExtension(audioFile.FileName);
                     string _path = Path.Combine(Server.MapPath("~/TempUpload"), _FileName);
                     audioFile.SaveAs(_path);
@@ -110,8 +121,12 @@ namespace Poordooytify.Controllers
             catch(Exception ex)
             {
                 TempData["Message"] = "File upload failed. Err: " + ex.Message;
+                db.Entry(song).State = EntityState.Modified;
+                db.SaveChanges();
                 return RedirectToAction("Create");
             }
+            finally { }
+
             return RedirectToAction("Index");
         }
 

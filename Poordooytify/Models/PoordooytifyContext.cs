@@ -14,15 +14,17 @@ namespace Poordooytify.Models
 
         public DbSet<Song> Songs { get; set; }
         public DbSet<CloudToken> CloudTokens { get; set; }
+        public DbSet<Genre> Genres { get; set; }
     }
 
-    public class AccessPoordooytifyContext : DbContext
-    {
-        public AccessPoordooytifyContext() : base("DbConnJetAccess")
-        {
-        }
+    //public class AccessPoordooytifyContext : DbContext
+    //{
+    //    public AccessPoordooytifyContext() : base("DbConnJetAccess")
+    //    {
+    //    }
 
-        public DbSet<Song> Songs { get; set; }
-        public DbSet<CloudToken> CloudTokens { get; set; }
-    }
+    //    public DbSet<Song> Songs { get; set; }
+    //    public DbSet<CloudToken> CloudTokens { get; set; }
+    //    public DbSet<Genre> Genres { get; set; }
+    //}
 }
