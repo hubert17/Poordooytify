@@ -1,0 +1,73 @@
+﻿@model Poordooytify.Models.Mood
+
+@{
+    ViewBag.Title = "Create";
+}
+
+@section styles {
+
+}
+
+<div class="col-md-12 center-on-mobile">
+    <h2>Create Mood</h2>
+</div>
+
+<div class="row">
+    
+    <div class="col-md-8">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <label for="@nameof(Model.CreatedBy)" class="control-label col-md-4">Your Alias</label>
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.CreatedBy, new { htmlAttributes = new { @class = "form-control", placeholder = "Kindly anonymously identify yourself" } })
+                        @Html.ValidationMessageFor(model => model.CreatedBy, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="@nameof(Model.Name)" class="control-label col-md-4">Mood (Playlist Name)</label>
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Creative name or feeling of this songlist" } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="@nameof(Model.Categories)" class="control-label col-md-4">Prevailing feeling</label>
+                    <div class="col-md-8">
+                        @Html.EditorFor(model => model.Categories, new { htmlAttributes = new { @class = "form-control", placeholder = "gisapot, happy, sad, mellow, aggressive, uplifting, melancholic, joyful" } })
+                        @Html.ValidationMessageFor(model => model.Categories, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-8">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+@section StickyButtons {
+    <nav class="navbar fixed-bottom bg-success hidden-sm-up footer-nav">
+        <div class="btn-group btn-block" role="group" aria-label="btn-footer">
+            <a href="@Url.Action("Index", "Mode")" class="btn btn-outline-secondary col-6  btnFooter">Moods</a>
+            <a href="@Url.Action("Index", "Songlib")" class="btn btn-outline-secondary col-6  btnFooter">Song List</a>
+        </div>
+    </nav>
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

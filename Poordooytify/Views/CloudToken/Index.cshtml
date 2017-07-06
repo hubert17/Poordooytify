@@ -4,6 +4,14 @@
     ViewBag.Title = "Index";
 }
 
+@*@helper replaceLastFour(String s)
+{
+    int length = s.length();
+    //Check whether or not the string contains at least four characters; if not, this method is useless
+    if (length < 4) return "****";
+    return s.substring(0, length - 4) + "****";
+}*@
+
 <h2>Index</h2>
 
 <p>
@@ -29,7 +37,7 @@
             @Html.DisplayFor(modelItem => item.AccountName)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Token)
+            @*@Html.DisplayFor(modelItem => item.Token)*@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.Inactive)
@@ -41,5 +49,98 @@
         </td>
     </tr>
 }
-
+   
 </table>
+
+<h2>One Drive Direct Link Generator</h2>
+<br />
+<label for="iframeTextTop">Paste your Ondrive embed code</label>
+<input id="iframeTextTop" name="iframeTextTop" type="text" />
+<button id="iframesrcgetTop">Get embed link</button>
+<br />
+<label for="textboxSearch">Or paste the embed source link</label>
+<input id="textboxSearch" name="textboxSearch" type="text" />
+<br />
+<button id="onedriveembedbutton">Get Download Link</button>
+<br />
+<label for="answer">Direct Link</label>
+<input id="answer" name="answer" type="text">
+
+<br />
+<a href="http://metadataconsulting.blogspot.ca/2017/01/OneDrive-2017-Direct-File-Download-URL-Maker.html" target="_blank">[Credits]</a>
+
+
+@section Scripts {
+
+<script language="JavaScript">
+    //copyright 2017, metadataconsulting.ca
+    //Jquery included in blogger.com
+    $(document).ready(function () {
+        $("#onedriveembedbutton").click(function () {
+            document.getElementById("answer").value = "";
+            // is Valid onedrive share link?
+            //https://onedrive.live.com/redir?resid=8F99649728BEB2F3!2737&authkey=!ACnO8wuwLQ07PqI&v=3&ithint=photo%2cgif
+            var stringURL = document.getElementById("textboxSearch").value;
+            //alert('validateOneDrive: strigURL = ' + stringURL);
+            var stringOneDrive = "https://onedrive.live.com/";
+            var stringOneDriveResid = "&resid=";
+            var stringOneDriveAuthKey = "&authkey=";
+            var download = "";
+
+            if (stringURL.indexOf(stringOneDrive) == 0 && stringURL.search(stringOneDriveAuthKey) > -1) {
+
+                //alert(document.getElementById("answer").value+"-");
+                // alert(stringURL.replace('redir', 'download'));
+                download = stringURL.replace('redir', 'download');
+                download = download.replace('embed', 'download');
+                document.getElementById("answer").value = download;
+                $('answer').val(download); //make sure
+                $('#directtest').html('<b style="color:red">New! Test</b> your direct download link: <a href="' + download + '" target="_blank">' + download + '</a>');
+
+
+                document.getElementById("textboxSearch").value = "";
+                document.getElementById("answer").select();
+                $('answer').select(); //make sure
+
+            } else {
+
+                if (stringURL.indexOf(stringOneDrive) != 0)
+                    alert('Not a valid OneDrive Shared Link, does not contain ' + stringOneDrive);
+                else if (stringURL.indexOf(stringOneDriveAuthKey) != 0)
+                    alert('Not a valid OneDrive Shared Link, does not contain authentication key string ' + stringOneDriveAuthKey);
+
+                document.getElementById("answer").value = "";
+            }
+
+            //alert('validateOneDrive: isValid = ' + isOneDrive);
+
+            //var isValid = confirm('Do you want to submit the form?');
+            //alert('validateMyForm: isValid = ' + isValid);
+
+            //return false;
+
+
+
+        });
+
+        $("#iframesrcget").click(function () {
+            var frametext = $("#iframeText").val();
+            var srcURL = $(frametext).attr('src');
+            $("#iframeText").val(srcURL);
+            $("#iframeText").select();
+        });
+
+        $("#iframesrcgetTop").click(function () {
+            var frametext = $("#iframeTextTop").val();
+            var srcURLTop = $(frametext).attr('src');
+            $("#iframeTextTop").val('');
+            //$("#iframeTextTop").val(srcURLTop);
+            //$("#iframeTextTop").select();
+            $("#textboxSearch").val(srcURLTop);
+
+        });
+
+
+    });
+</script>
+}

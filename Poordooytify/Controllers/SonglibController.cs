@@ -17,22 +17,65 @@ namespace Poordooytify.Controllers
     {
         // GET: Songlib
         PoordooytifyContext db = new PoordooytifyContext();
-
-        // GET: Home
-        public ActionResult Index(string q = "", string r = "")
+       
+        public ActionResult Index(string q = "", string r = "", string m = "", int pageSize = 20, int page = 1 )
         {
+
+            var dbSongs = db.Songs.Where(x => x.CloudToken.Inactive == false);
+            var pagedSongs = dbSongs.OrderByDescending(o => o.Id).Skip((page - 1) * pageSize).Take(pageSize);
             var songs = new List<Song>();
-            if(string.IsNullOrEmpty(q))
+            ViewBag.Moods = db.Moods.OrderByDescending(x => x.ModifiedDate).ThenBy(o => o.CreateDate).ToList();
+            var Loadbutton = false;
+            var ImHome = false;
+
+            if (page>1)
             {
-                if(string.IsNullOrEmpty(r))
-                    songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(o => o.Id).ToList();
+                var SongIds = Newtonsoft.Json.JsonConvert.SerializeObject(pagedSongs.Select(s => s.Id));
+                @ViewBag.SongIds = SongIds;
+                return PartialView("_SongCard", pagedSongs);
+            }
+
+            if (string.IsNullOrEmpty(m))
+            {
+                if (string.IsNullOrEmpty(q))
+                {
+                    if (string.IsNullOrEmpty(r))
+                    {
+                        songs = pagedSongs.ToList();
+                        ImHome = true;
+                    }
+                    else
+                        songs = dbSongs.OrderByDescending(d => d.PlayCount).Take(20).ToList();
+                    Loadbutton = true;
+                }
                 else
-                    songs = db.Songs.Where(x => x.CloudToken.Inactive == false).OrderByDescending(d=>d.PlayCount).Take(20).ToList();
+                {
+                    songs = dbSongs.Where(x => x.Title.Contains(q) || x.Artist.Contains(q) || x.Genre.Contains(q)).Take(20).OrderBy(o => o.PlayCount).ToList();
+                }
             }
             else
             {
-                songs = db.Songs.Where(x => x.CloudToken.Inactive == false).Where(x => x.Title.Contains(q) || x.Artist.Contains(q) || x.Genre.Contains(q)).Take(10).OrderBy(o=>o.PlayCount).ToList();                
+                songs = (from s in dbSongs
+                              join sm in db.SongMoods on s.Key equals sm.SongKey
+                              where sm.MoodKey == m && s.CloudToken.Inactive == false
+                              select new 
+                              {
+                                  Id = s.Id,
+                                  Title = s.Title,
+                                  Artist = s.Artist,
+                                  Link = s.Link
+                              }).ToList().Select(s => new Song
+                                 {
+                                     Id = s.Id,
+                                     Title = s.Title,
+                                     Artist = s.Artist,
+                                     Link = s.Link
+                                 }).ToList();
+                TempData["InstantPlaySongId"] = songs.FirstOrDefault().Id;
             }
+
+            ViewBag.Home = ImHome;
+            ViewBag.Loadbutton = Loadbutton;
             return View(songs);
         }
 
@@ -40,9 +83,11 @@ namespace Poordooytify.Controllers
         {
             var storage = db.CloudTokens.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.AccountName }).ToList();
             ViewBag.storage = storage;
+            ViewBag.genres = Newtonsoft.Json.JsonConvert.SerializeObject(db.Genres.Select(g => g.Name).ToList());
             return View();
         }
 
+        [HttpPost]
         public ActionResult GetLink(int songId)
         {
             var song = new Song();
@@ -51,12 +96,27 @@ namespace Poordooytify.Controllers
             {
                 song = db.Songs.Find(songId);
                 songLink = song.Link;
-                song.PlayCount = song.PlayCount + 1;
                 db.Entry(song).State = EntityState.Modified;
                 db.SaveChanges();
             }
             catch { }
             return Json(new { songLink = songLink }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public EmptyResult AddPlayCount(int songId)
+        {
+            var song = new Song();
+            try
+            {
+                song = db.Songs.Find(songId);
+                song.PlayCount = song.PlayCount + 1;
+                db.Entry(song).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+            catch { }
+            //return Json( song.PlayCount, JsonRequestBehavior.AllowGet);
+            return null;
         }
 
         public async Task<ActionResult> Artists(string q)
@@ -86,14 +146,16 @@ namespace Poordooytify.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult UploadAudioFile(HttpPostedFileBase audioFile, Song song, string BitRate)
         {
-            TempData["RecentSongId"] = 0;
+            TempData["InstantPlaySongId"] = 0;
             var songId = 0;
             try
             {
                 if (audioFile.ContentLength > 0)
                 {
+                    //song.Key = PoordooytifyKey.Generate();
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     song.Title = textInfo.ToTitleCase(song.Title);
                     song.Artist = textInfo.ToTitleCase(song.Artist);
@@ -101,6 +163,7 @@ namespace Poordooytify.Controllers
                     db.Songs.Add(song);
                     song.OrigFilename = Path.GetFileName(audioFile.FileName);
                     song.DateAdded = DateTime.Now;
+                    song.Key = PoordooytifyKey.Generate();
                     db.SaveChanges();
 
                     songId = song.Id;
@@ -114,8 +177,8 @@ namespace Poordooytify.Controllers
                     }
                     var task = Task.Run(() => UploadToDropbox(fileToUpload, song.Id, song.CloudTokenId));
                     task.Wait();
-                    TempData["RecentSongId"] = song.Id;
-                    TempData.Keep("RecentSongId");
+                    TempData["InstantPlaySongId"] = song.Id;
+                    TempData.Keep("InstantPlaySongId");
                 }
             }
             catch(Exception ex)

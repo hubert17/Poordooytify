@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Poordooytify.Models.Mood>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+
+<div class="col-md-12">
+    <h2 class="hidden-sm-up text-center">Moods</h2>
+    <h2 class="hidden-xs-down ">Moods</h2>
+    <p>
+        <a href="@Url.Action("Create")" class="btn btn-outline-success btn-block hidden-sm-up btnFooter">Add Mood</a>
+        <a href="@Url.Action("Create")" class="btn btn-outline-success hidden-xs-down btnFooter">Add Mood</a>
+    </p>
+</div>
+
+<div class="col-md-6">
+    <div id="accordion" role="tablist" aria-multiselectable="true">
+        <div class="card">
+            @foreach (var mood in Model)
+            {
+                <div class="card-header" role="tab" id="heading-@mood.Id">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@mood.Id" aria-expanded="true" aria-controls="collapse-@mood.Id">
+                        @mood.Name <small class="text-muted">@mood.CreatedBy</small>
+                    </a>
+                </div>
+                <div id="collapse-@mood.Id" data-moodId="@mood.Id" data-moodKey="@mood.Key" class="collapse" role="tabpanel" aria-labelledby="heading-@mood.Id">
+                    <div class="card-block text-muted small">
+                        @*Song titles here top 3*@
+                    </div>
+                    <div class="card-footer card-outline-success">
+                        <!-- Example single danger button -->
+                        <a href="@Url.Action("index","songlib", new { m = mood.Key })" class="btn btn-success btn-block">Play</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+
+
+@section StickyButtons {
+    <nav class="navbar fixed-bottom bg-success hidden-sm-up footer-nav ">
+        <div class="btn-group btn-block" role="group" aria-label="btn-footer">
+            <a href="@Url.Action("Create", "Mood")" class="btn btn-outline-secondary col-6 btnFooter ">Add Mood</a>
+            <a href="@Url.Action("Index", "Songlib")" class="btn btn-outline-secondary col-6  btnFooter">Song List</a>
+        </div>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        $('#accordion > .card > .collapse').on('show.bs.collapse', function (e) {
+            var moodKey = $('#' + e.currentTarget.id).attr('data-moodKey');
+            var moodId = $('#' + e.currentTarget.id).attr('data-moodId');
+            if ($('#collapse-' + moodId + ' > .card-block').find().length == 0) {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("GetTitles", "Mood")",
+                    data: {
+                        moodKey: moodKey
+                    },
+                    success: function (result) {
+                        $('#collapse-' + moodId + ' > .card-block').html('<em>' + result + '...</em>');
+                    }
+                });
+            }
+
+        })
+</script>
+}
+

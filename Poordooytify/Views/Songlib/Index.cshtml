@@ -4,18 +4,50 @@
     ViewBag.Title = "Song List";
 }
 
+@section styles { 
 <style>
     audio {
         width: 100%
     }
+
+
+
+
 </style>
+}
+
+@helper Moods(string SongKey){
+foreach (var m in ViewBag.Moods as List<Poordooytify.Models.Mood>)
+{
+        <a class="dropdown-item mood-link" href="@Url.Action("AddSong", "Mood", new { moodKey = m.Key, songKey = SongKey })">@m.Name</a>
+}
+}
 
 <div class="col-md-12">
     <p>
-        <a href="@Url.Action("Create")" class="btn btn-outline-primary btn-block hidden-sm-up">Upload Song</a>
-        <a href="@Url.Action("Create")" class="btn btn-outline-primary hidden-xs-down">Upload Song</a>
+        <a href="@Url.Action("Create")" class="btn btn-outline-success btn-block hidden-sm-up">Upload Song</a>
+        <a href="@Url.Action("Create")" class="btn btn-outline-success hidden-xs-down">Upload Song</a>
     </p>
 </div>
+
+@if (ViewBag.Home)
+{
+    <div id="autoplayTip" style="display:none" class="alert alert-warning alert-dismissible col-md-6 fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>[Continous Playback]</strong> Autoplay of HTML5 audio is disabled by default in Chrome browser.
+        No worries, <span id="autoplayTapHere" class="badge badge-warning" data-toggle="modal" style="cursor:pointer" data-target="#tipModal">tap here</span> for the workaround instruction.
+        This is not a problem in Firefox and all other desktop browsers.
+    </div>
+
+    <div class="alert alert-info alert-dismissible col-md-6 fade show" role="alert">
+        <h3>Updates</h3>
+        <strong>Moods</strong> You can now create your Mood (Playlist) and play only the songs that matches your prevailing feeling. <br />
+        <strong><a href="@Url.Action("index", "songlib", new { r = "1" })">Top 20 Songs</a></strong> Check out our top tracks!
+    </div>
+
+}
 
 
 <div class="col-md-6">
@@ -35,38 +67,86 @@
                     {
                         song.Link = song.Link.Remove(song.Link.Length - 1, 1) + "1";
                     }
-                    bool recent = false;
-                    var collapseShow = string.Empty;
-                    if (TempData["RecentSongId"] != null && song.Id == (int)TempData["RecentSongId"])
-                    {
-                        recent = true;
-                        collapseShow = "show";
+                    //bool recent = false;
+                    //var collapseShow = string.Empty;
+                    //if (TempData["InstantPlaySongId"] != null && song.Id == (int)TempData["InstantPlaySongId"])
+                    //{
+                    //    recent = true;
+                    //    collapseShow = "show";
 
-                    }
+                    //}
                     <div class="card-header" role="tab" id="heading-@song.Id">
                         <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@song.Id" aria-expanded="true" aria-controls="collapse-@song.Id">
                             @song.Title <small class="text-muted">@song.Artist</small>
                         </a>
                     </div>
-                    <div id="collapse-@song.Id" data-songId="@song.Id" class="collapse @collapseShow" role="tabpanel" aria-labelledby="heading-@song.Id">
+                    <div id="collapse-@song.Id" data-songId="@song.Id" data-titleartist="@(song.Title + " by " + song.Artist)" class="collapse " role="tabpanel" aria-labelledby="heading-@song.Id">
                         <div class="card-block">
-                            @if (recent)
+                            @*@if (recent)
                             {
                                 <audio name="media-@song.Id" id="media-@song.Id" controls autoplay>
-                                    <source src="@song.Link" type="application/ogg">
+                                    <source src="@song.Link" type="audio/webm">
                                 </audio>
-                            }
+                            }*@
+                        </div>
+                        <div class="card-footer card-outline-success">
+                            <!-- Example single danger button -->
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <img src="@Url.Content("~/Images/star.png")" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    @Moods(song.Key)
+                                    <a class="dropdown-item" href="#">More...</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("create","mood")">Create Mood</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 }
             </div>
 
         </div>
     }
 
+    @if (ViewBag.Loadbutton)
+    {
+        <div class="card text-center card-outline-success card-inverse">
+            <div class="card-footer">
+                <a href class="btn-block hidden-sm-up btnLoadMore">Load more...</a>
+                <a href class="btn-block hidden-xs-down btnLoadMore">Load more...</a>
+            </div>
+        </div>
+
+    }
 </div>
 
+
+@section StickyButtons {
+<nav class="navbar fixed-bottom bg-success hidden-sm-up footer-nav hide-nav-footer">
+    <div class="btn-group btn-block" role="group" aria-label="btn-footer">
+        <a href="@Url.Action("Create", "Songlib")" class="btn btn-outline-secondary col-6 btnFooter">Upload Song</a>
+        <a href="@Url.Action("Index", "Mood")" class="btn btn-outline-secondary col-6 btnFooter">Mood</a>
+    </div>
+    @*<button id="btnPlayNext" class="btn btn-secondary disabled" disabled>
+        <img src="@Url.Content("~/Images/skip.png")" />
+    </button>*@
+</nav>
+}
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="tipModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img id="imgTip" src="" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
@@ -78,37 +158,94 @@
         }
 
         var arrSongIds = @arrIds;
-        //var curId = arrSongIds[0];
+        var arrPlayedSongIds = [];
 
-        $('#accordion > .card > .collapse').on('show.bs.collapse', function (e) {
+        function addToArrPlayed(val) {
+            var el = parseInt(val);
+
+            if (arrSongIds.length == 0) {
+                arrSongIds.push.apply(arrSongIds, arrPlayedSongIds);
+                arrPlayedSongIds.length = 0;
+            }
+
+            var index = arrSongIds.indexOf(el);
+            if (index > -1) {
+                arrSongIds.splice(index, 1);
+                arrPlayedSongIds.push(el);
+                //console.log('Played songs: ' + JSON.stringify(arrPlayedSongIds));
+                //console.log('Unplayed songs: ' + JSON.stringify(arrSongIds));
+            }
+
+            $.ajax({
+                method: "POST",
+                url: "@Url.Action("AddPlayCount", "Songlib")",
+                data: { songId: val}
+            })
+            .done(function (res) {
+                //console.log(res);
+            });
+        }
+
+        function onTrackedVideoFrame(currentTime, duration, titleartist) {
+            //console.log(currentTime);
+            //console.log(duration);
+            $(document).prop('title', formatSecondsAsTime(currentTime) + ' ' + titleartist );
+        }
+
+        function formatSecondsAsTime(secs) {
+            var hr = Math.floor(secs / 3600);
+            var min = Math.floor((secs - (hr * 3600)) / 60);
+            var sec = Math.floor(secs - (hr * 3600) - (min * 60));
+
+            if (min < 10) {
+                min = "0" + min;
+            }
+            if (sec < 10) {
+                sec = "0" + sec;
+            }
+
+            return min + ':' + sec;
+        }
+
+        $(document).on("show.bs.collapse", '#accordion > .card > .collapse', function (e) {
             //alert('Event fired on #' + e.currentTarget.id);
             var sounds = document.getElementsByTagName('audio');
             for (i = 0; i < sounds.length; i++) sounds[i].pause();
 
-            var songId = $('#' + e.currentTarget.id).attr('data-songId');
+            var random = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];            
+            var curAudio;
+
+            var songId = $('#' + e.currentTarget.id).attr('data-songId');            
+            var titleartist = $('#' + e.currentTarget.id).attr('data-titleartist');
             if ($('#collapse-' + songId + ' > .card-block').find('audio').length == 0) {
                 $.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "@Url.Action("GetLink","Songlib")",
                     dataType: 'json',
                     data: {
                         songId: songId
                     },
                     success: function (result) {
-                        $('#collapse-' + songId + ' > .card-block').html('<audio name="media-' + songId + '" id="media-' + songId + '" autoplay controls><source src="' + result.songLink.slice(0, -1) + '1" type="application/ogg"></audio>');
+                        $('#collapse-' + songId + ' > .card-block').html('<audio name="media-' + songId + '" id="media-' + songId + '" autoplay controls><source src="' + result.songLink.slice(0, -1) + '1" type="audio/webm"></audio>');
 
-                        var curAudio = document.getElementById("media-" + songId);
+                        curAudio = document.getElementById("media-" + songId);
                         curAudio.onplay = function () {
-                            //console.log("The video has started to play: " + songId);
-                            curAudio.onended = function () {
-                                var random = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];
+                            addToArrPlayed(songId);
+                            $("#media-" + songId).on(
+                                "timeupdate",
+                                function (event) {
+                                    onTrackedVideoFrame(this.currentTime, this.duration, titleartist);
+                                });
+
+                            curAudio.onended = function () {                 
                                 //console.log("The audio has ended: " + songId);
                                 $('#collapse-' + random).collapse('show');
-                                $('#collapse-' + songId).collapse('hide');
-                                $('html, body').animate({
-                                    scrollTop: $('#collapse-' + random).offset().top - 200
-                                }, 4000);
-                                ////console.log(".collapse me: " + random);
+                                setTimeout(function () {
+                                    $('#collapse-' + songId).collapse('hide');
+                                    $('html, body').animate({
+                                        scrollTop: $('#collapse-' + random).offset().top - 350
+                                    }, 4000);                                
+                                }, 3000);
                             };
                         };
 
@@ -119,18 +256,153 @@
                 curAudio = document.getElementById("media-" + songId);
                 curAudio.play();
                 curAudio.onplay = function () {
+                    addToArrPlayed(songId);
                     curAudio.onended = function () {
-                        var random = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];
+                        //console.log("The repeat audio has ended: " + songId);
                         $('#collapse-' + random).collapse('show');
-                        $('#collapse-' + songId).collapse('hide');
-                        $('html, body').animate({
-                            scrollTop: $('#collapse-' + random).offset().top - 200
-                        }, 4000);
+                        setTimeout(function () {
+                            $('#collapse-' + songId).collapse('hide');
+                            $('html, body').animate({
+                                scrollTop: $('#collapse-' + random).offset().top - 350
+                            }, 4000);
+                        }, 3000);
                     };
                 };
             }
 
+            //To do: multiple playback on Next
+            $('#btnPlayNext').click(function (event) {
+                $('#btnPlayNext').prop('disabled', true);
+
+                //var sounds = document.getElementsByTagName('audio');
+                //for (i = 0; i < sounds.length; i++) {
+                //    sounds[i].pause();
+                //    sounds[i].currentTime = 0
+                //}
+                curAudio.pause;
+                curAudio.currentTime = 0;
+
+                var randomSkip = arrSongIds[Math.floor(Math.random() * arrSongIds.length)];
+                $('#collapse-' + songId).collapse('hide');
+                $('#collapse-' + randomSkip).collapse('show');
+                $('html, body').animate({
+                    scrollTop: $('#collapse-' + randomSkip).offset().top - 200
+                }, 0);
+            });
 
         })
+
+        //$('#accordion > .card > .collapse').on('show.bs.collapse', function (e) {
+        //    });
+
+    </script>
+
+    @if(TempData["InstantPlaySongId"]!=null)
+    {
+        <script>
+            $(document).ready(function () {
+                $('#collapse-@TempData["InstantPlaySongId"]').collapse('show');
+            });
+        </script>
+    }
+
+    <script>
+            $(document).ready(function () {
+                var LoadPageNum = 2;
+                $(document).on("click", '.btnLoadMore', function (e) {
+                    e.preventDefault();
+                    $('.btnLoadMore').text("Loading please wait...");
+                    $.ajax({
+                        method: "GET",
+                        url: "@Url.Action("Index", "Songlib")",
+                        dataType: 'html',
+                        data: { page: LoadPageNum, q: '@Request.QueryString["q"]' }
+                    })
+                        .done(function (res) {
+                            if (res.indexOf("LAsT_PAgE_0000") > -1) {
+                                $('.btnLoadMore').remove();
+                            }
+                            else {
+                                $('#accordion').append(res);
+                                $('.btnLoadMore').text("Load pa more...");
+                                console.log('Current Ids: ' + JSON.stringify(arrSongIds));
+                                arrSongIds.push.apply(arrSongIds, JSON.parse($('#arrAjaxSongIds').val()));
+                                console.log('New Ids: ' + JSON.stringify(arrSongIds));
+                                LoadPageNum++;
+                          }
+                    });
+                });
+
+            });
+    </script>
+
+    <script>
+        $('.mood-link').click(function (event) {
+            event.preventDefault();
+            var mlink = $(this);
+            $.ajax({
+                method: "POST",
+                url: mlink.attr('href')
+            })
+            .done(function (result) {
+                console.log("Data Saved: " + result);
+                if (result) {
+                    mlink.removeAttr("href");
+                    mlink.html(mlink.html() + ' ✔');
+                }
+                mlink.addClass('text-success');
+                //$(this).html($(this).html() + '[✔]')
+            });
+
+            return false; //for good measure
+        });
+        
+
+    </script>
+
+<script>
+        $(window).scroll(function (event) {
+            function footer() {
+                var scroll = $(window).scrollTop();
+                if (scroll > 50) {
+                    $(".footer-nav").fadeIn("slow").removeClass("hide-nav-footer");
+                }
+                else {
+                    $(".footer-nav").fadeOut("slow").addClass("hide-nav-footer");
+                }
+
+                clearTimeout($.data(this, 'scrollTimer'));
+                $.data(this, 'scrollTimer', setTimeout(function () {
+                    if ($('.footer-nav').is(':hover')) {
+                        footer();
+                    }
+                    else {
+                        $(".footer-nav").fadeOut("slow");
+                    }
+                }, 2000));
+            }
+            footer();
+        });
+</script>
+
+    <script>
+            $(document).ready(function () {
+                var isWebkit = 'WebkitAppearance' in document.documentElement.style
+                var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isWebkit) {
+                    $('#autoplayTip').show();
+                    $("#tipModal").click(function () {
+                        $(this).modal('hide');
+                    });
+                    if (!isMobile) {
+                        $('#autoplayTapHere').html('click here');
+                    }
+                }
+            });
+
+            $('#tipModal').on('show.bs.modal', function (e) {
+                $("#imgTip").attr("src", "https://preview.ibb.co/gUmOVF/autoplay_fixed.png");
+            })
+
     </script>
 }

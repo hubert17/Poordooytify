@@ -15,6 +15,9 @@ namespace Poordooytify.Models
         public DbSet<Song> Songs { get; set; }
         public DbSet<CloudToken> CloudTokens { get; set; }
         public DbSet<Genre> Genres { get; set; }
+
+        public DbSet<Mood> Moods { get; set; }
+        public DbSet<SongMood> SongMoods { get; set; }
     }
 
     //public class AccessPoordooytifyContext : DbContext
@@ -27,4 +30,13 @@ namespace Poordooytify.Models
     //    public DbSet<CloudToken> CloudTokens { get; set; }
     //    public DbSet<Genre> Genres { get; set; }
     //}
+
+    public class PoordooytifyKey
+    {
+        public static string Generate()
+        {
+            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+        }
+    }
+
 }

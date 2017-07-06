@@ -2,7 +2,9 @@
 var form = $('#form-submit');
 form.submit(function () {
     if (form.valid()) {
-       alert('Naga-depende ang kadugayon sa pag-upload sa imong internet connection. Taasi gamay imong pasensya. Salamat sa pag-share. :)');
+        if (isMobile) {
+            alert('Naga-depende ang kadugayon sa pag-upload sa imong internet connection. Taasi gamay imong pasensya. Salamat sa pag-share. :)');
+        }
         var $el = $(":submit", this);
         $el.text(form.attr("name"));
         submitAnimator($el);

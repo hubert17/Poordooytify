@@ -58,6 +58,7 @@ namespace Poordooytify.Controllers
             return View(cloudToken);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: CloudToken/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -89,6 +90,7 @@ namespace Poordooytify.Controllers
             return View(cloudToken);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: CloudToken/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -104,6 +106,7 @@ namespace Poordooytify.Controllers
             return View(cloudToken);
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: CloudToken/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

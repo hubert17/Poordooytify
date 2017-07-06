@@ -4,14 +4,53 @@
     ViewBag.Title = "Music Uploader";
 }
 
+@section styles {    
+<link href="@Url.Content("~/Content/typeaheadjs.css")" rel="stylesheet" />
+    @*<link href="@Url.Content("~/Content/tagsinput.css")" rel="stylesheet" />*@
+    <style>
+        .bootstrap-tagsinput {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            display: block;
+            padding: 4px 6px;
+            color: #555;
+            vertical-align: middle;
+            border-radius: 4px;
+            max-width: 100%;
+            line-height: 22px;
+            cursor: text;
+        }
+
+            .bootstrap-tagsinput input {
+                border: none;
+                box-shadow: none;
+                outline: none;
+                background-color: transparent;
+                padding: 0 6px;
+                margin: 0;
+                width: auto;
+                max-width: inherit;
+            }
+    </style>
+}
+
 <div class="col-md-12">
     <h2>Upload your song</h2>
+</div>
+
+<div id="uploadTip" style="display:none" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>[Upload Issue]</strong> Please use Chrome browser as you might encounter trouble uploading files in Firefox for Android.
 </div>
 
 <div class="row">
     <div class="col-md-6">
 
-        <form action="@Url.Action("UploadAudioFile", "Songlib")" method="post" enctype="multipart/form-data" name="Uploading" id="form-submit" >
+        <form action="@Url.Action("UploadAudioFile", "songlib")" method="post" enctype="multipart/form-data" name="Uploading" id="form-submit" >
+            @Html.AntiForgeryToken()
 
             <div class="form-group">
                 <label for="audioFile" class="control-label col-md-3">File</label>
@@ -47,7 +86,7 @@
             <div class="form-group">
                 <label for="@nameof(Model.Genre)" class="control-label col-md-3">@nameof(Model.Genre)</label>
                 <div class="col-md-9">
-                    <input type="text" class="form-control" name="@nameof(Model.Genre)" id="@nameof(Model.Genre)" />
+                    <input type="text" data-role="tagsinput" class="form-control" name="@nameof(Model.Genre)" id="@nameof(Model.Genre)" placeholder="Tap to add more" />
                 </div>
             </div>
 
@@ -79,8 +118,7 @@
 @{ Html.RenderPartial("_ValidationScriptsPartial"); }
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js" integrity="sha256-LOnFraxKlOhESwdU/dX+K0GArwymUDups0czPWLEg4E=" crossorigin="anonymous"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js" integrity="sha256-LOnFraxKlOhESwdU/dX+K0GArwymUDups0czPWLEg4E=" crossorigin="anonymous"></script>    
     <script>
         $(document).ready(function () {
             $('.typeahead').typeahead({
@@ -101,7 +139,37 @@
         });
     </script>
 
-@{ Html.RenderPartial("_SubmitAnimationScriptPartial"); }
+    <script src="@Url.Content("~/Scripts/tagsinput.js")"></script>
+    <script>
+        $('#Genre').tagsinput({
+            typeahead: {
+                source: @Html.Raw(ViewBag.genres),
+                maxTags: 3        
+            }
+        });
+        $('#Genre').on('itemAdded', function (event) {
+            $('.bootstrap-tagsinput').find('input').css("color", "transparent");;
+        });
 
+    </script>
+
+    <script>
+        var isWebkit = true;
+        var isMobile = true;
+        $(document).ready(function () {
+            isWebkit = 'WebkitAppearance' in document.documentElement.style
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (!isWebkit) {
+                $('#uploadTip').show();
+                if (!isMobile) {
+                    $('#uploadTip').hide();
+                }
+            }
+
+        });
+    </script>
+
+@{ Html.RenderPartial("_SubmitAnimationScriptPartial"); }
 
 }

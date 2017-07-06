@@ -16,7 +16,7 @@ namespace Poordooytify.Controllers
     {
         public ActionResult Index()
         {
-            //var dbsql = new PoordooytifyContext();
+            var dbsql = new PoordooytifyContext();
             //var dbmdb = new AccessPoordooytifyContext();
 
             //var token = dbmdb.CloudTokens.ToList();
@@ -26,6 +26,15 @@ namespace Poordooytify.Controllers
             //dbsql.Songs.AddRange(songs);
             //dbsql.SaveChanges();
 
+            //var songs = dbsql.Songs.Where(g => string.IsNullOrEmpty(g.Key)).ToList();
+            //foreach (var s in songs)
+            //{
+            //    s.Key = PoordooytifyKey.Generate();
+            //}
+            //dbsql.SaveChanges();
+
+
+            //return Content("success");
             return RedirectToAction("Index", "Songlib");
         }
 

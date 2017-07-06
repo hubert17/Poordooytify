@@ -10,6 +10,9 @@ namespace Poordooytify.Models
     public class Song
     {
         public int Id { get; set; }
+        [MaxLength(30)]
+        [Index(IsUnique = true)]
+        public string Key { get; set; }
         [Required]
         public string Title { get; set; }
         [Required]
@@ -24,4 +27,5 @@ namespace Poordooytify.Models
         public DateTime DateAdded { get; set; }
         public int PlayCount { get; set; }
     }
+
 }

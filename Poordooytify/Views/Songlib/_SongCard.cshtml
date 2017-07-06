@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Poordooytify.Models.Song>
+
+@helper Moods(string SongKey)
+{
+foreach (var m in ViewBag.Moods as List<Poordooytify.Models.Mood>)
+{
+        <a class="dropdown-item mood-link" href="@Url.Action("AddSong", "Mood", new { moodKey = m.Key, songKey = SongKey })">@m.Name</a>
+}
+}
+
+@if (Model.Count() > 0)
+{
+    <div class="card">
+        @foreach (var song in Model)
+        {
+            if (!string.IsNullOrEmpty(song.Link))
+            {
+                song.Link = song.Link.Remove(song.Link.Length - 1, 1) + "1";
+            }
+            <div class="card-header" role="tab" id="heading-@song.Id">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@song.Id" aria-expanded="true" aria-controls="collapse-@song.Id">
+                    @song.Title <small class="text-muted">@song.Artist</small>
+                </a>
+            </div>
+            <div id="collapse-@song.Id" data-songId="@song.Id" data-titleartist="@(song.Title + " by " + song.Artist)" class="collapse " role="tabpanel" aria-labelledby="heading-@song.Id">
+                <div class="card-block">
+                </div>
+                <div class="card-footer card-outline-success">
+                    <!-- Example single danger button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="@Url.Content("~/Images/star.png")" />
+                        </button>
+                        <div class="dropdown-menu">
+                            @Moods(song.Key)
+                            <a class="dropdown-item" href="#">More...</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="@Url.Action("create","mood")">Create Mood</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <input type="hidden" id="arrAjaxSongIds" value="@ViewBag.SongIds" />
+}
+else
+{
+    <i>LAsT_PAgE_0000</i>
+}
